@@ -8,6 +8,7 @@
        integer, parameter :: Nmdos=1000
        !integer, parameter :: NQPTS=15625
        !integer, parameter :: Nkp=160
+       logical, parameter :: fftw_fl=.true.
        real*8, allocatable :: nf(:),n0(:)                       
        real*8::sum1,sum2,delta1,dfac
        real*8, allocatable :: U_ab(:,:)
@@ -683,7 +684,7 @@
 	    rho2(i)=-ferm(-i)*dimag(Gfscript(j,i))/pi
 	  end do
           if(uniform_grid==1) then 
-             call convolve_fft(N,w,dw,rho1,rho2,chi)
+             call convolve_fft(N,w,dw,rho1,rho2,chi,fftw_fl)
           else
              call convolve(Nm,rho1,rho2,chi)
           end if
@@ -704,7 +705,7 @@
 	    rho2(i)=-ferm(i)*dimag(Gfscript(j,i))/pi
 	  end do
           if(uniform_grid==1) then 
-             call convolve_fft(N,w,dw,rho1,rho2,chi)
+             call convolve_fft(N,w,dw,rho1,rho2,chi,fftw_fl)
           else
              call convolve(Nm,rho1,rho2,chi)
           end if
@@ -836,7 +837,7 @@
 	    end do
 
             if(uniform_grid==1) then 
-             call convolve_fft(N,w,dw,rho1,rho2,rhosigma1)
+             call convolve_fft(N,w,dw,rho1,rho2,rhosigma1,fftw_fl)
             else
              call convolve(Nm,rho1,rho2,rhosigma1)
             end if
@@ -851,7 +852,7 @@
 	    end do
 
             if(uniform_grid==1) then 
-             call convolve_fft(N,w,dw,rho1,rho2,rhosigma2)
+             call convolve_fft(N,w,dw,rho1,rho2,rhosigma2,fftw_fl)
             else
              call convolve(Nm,rho1,rho2,rhosigma1)
             end if
@@ -1302,7 +1303,7 @@
 	  rho2(j)=glog(j)
         end do
 
-        call convolve_fft(N,w,dw,rho1,rho2,rlsg1)
+        call convolve_fft(N,w,dw,rho1,rho2,rlsg1,fftw_fl)
 
 	rho1=0.d0
 	rho2=0.d0
@@ -1314,7 +1315,7 @@
 	  rho2(j)=qlog(j)
         end do
 
-        call convolve_fft(N,w,dw,rho1,rho2,rlsg2)
+        call convolve_fft(N,w,dw,rho1,rho2,rlsg2,fftw_fl)
 
 	do j=-N,N
 	  rlsg(-j)=-rlsg1(j)-rlsg2(j)

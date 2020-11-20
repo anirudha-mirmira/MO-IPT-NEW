@@ -1,10 +1,21 @@
 
-subroutine convolve_fft(n,w,dw,rho1,rho2,rho3)
+subroutine convolve_fft(n,w,dw,rho1,rho2,rho3,fftw_f)
 integer :: n
 real*8 :: w(-n:n),rho1(-n:n), rho2(-n:n), rho3(-n:n),dw
 integer :: nft,m,n2
 complex*16, allocatable :: z1(:),z2(:),z3(:)
 complex*16,parameter :: zero=(0.d0,0.d0)
+logical ::fftw_f
+
+interface
+   subroutine fftwf(N,x,iflag)
+      implicit none
+      integer,intent(in)::N
+      complex*16,intent(inout)::x(0:N-1)
+      integer,intent(in)::iflag
+   end subroutine
+end interface
+
 
 n2=2*(2*n+1)
 nft=2
@@ -31,15 +42,24 @@ do i=-n,n
   z2(i+n+1)=dcmplx(rho2(i),0.d0)
 end do
 
-call dffteu(nft,z1,m,0)
-call dffteu(nft,z2,m,0)
+if (fftw_f) then
+  call fftwf(nft,z1,1)
+  call fftwf(nft,z2,1)
+else
+  call dffteu(nft,z1,m,0)
+  call dffteu(nft,z2,m,0)
+endif
 
 do i=1,nfti
   z3(i)=dw*z1(nft-i)*z2(i)
 end do
 z3(0)=dw*z1(0)*z2(0)
 
-call dffteu(nft,z3,m,-1)
+if (fftw_f) then
+ call fftwf(nft,z3,-1)
+else
+ call dffteu(nft,z3,m,-1)
+endif
 
 do i=-n,-1
   rho3(i) = dreal(z3(nfti+i+1))
